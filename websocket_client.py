@@ -5,32 +5,52 @@ from typing import Any
 
 
 class WebSocketClient:
-    def __init__(self, uri: str = "ws://localhost:3000"):
+    """
+    Websocket Client für JSON-RPC 2.0 Aufrufe
+
+    Ermöglicht asynchrone Aufrufe von Server Funktionen über WebSocket
+    """
+    def __init__(self, uri: str = "ws://localhost:3000") -> None:
+        """
+        Konstruktor des Websocket Clients
+        :param uri: Websocket URI des Servers, default="ws://localhost:3000"
+        """
         self.uri = uri
         self.websocket = None
         self.request_id = 0
 
-    async def connect(self):
-        """Verbindet mit dem WebSocket Server"""
+    async def connect(self) -> None:
+        """
+        Verbindet mit dem WebSocket Server
+
+        :raises: WebsocketException bei Verbindungsfehlern
+        """
         self.websocket = await websockets.connect(self.uri)
         print(f"Verbunden mit {self.uri}")
 
-    async def disconnect(self):
-        """Trennt die Verbindung"""
+    async def disconnect(self) -> None:
+        """
+        Trennt die Verbindung zum Server und schließt die Websocket-Verbindung sauber
+        :return:
+        """
         if self.websocket:
             await self.websocket.close()
             print("Verbindung getrennt")
 
     async def call(self, method: str, **params) -> Any:
         """
-        Ruft eine Remote-Methode auf
+        Ruft eine Remote-Methode auf dem Server auf
 
         Args:
-            method: Name der Methode
-            **params: Parameter für die Methode
+            method: Name der Server-Methode
+            **params: Parameter für die Methode als kwargs
 
         Returns:
             Das Ergebnis der Methode
+
+        :raises:
+            ConnectionError: Wenn keine Verbindung besteht
+            Exception: Bei Server-Fehlern oder Netzwerkproblemen
         """
         if not self.websocket:
             raise ConnectionError("Keine Verbindung zum Websocket")
@@ -57,13 +77,24 @@ class WebSocketClient:
 
         return response.get("result")
 
-    async def __aenter__(self):
-        """Context Manager Support"""
+    async def __aenter__(self) -> 'WebSocketClient':
+        """
+        Context Manager Entry Point
+
+        Returns:
+            self: Die Client Instanz
+        """
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Context Manager Support"""
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        """
+        Context Manager Exit Point
+
+        :arg exc_type: Exception Typ (falls vorhanden)
+        :arg exc_val: Exception Wert (falls vorhanden)
+        :arg exc_tb: Exception Traceback (falls vorhanden)
+        """
         await self.disconnect()
 
 
@@ -78,8 +109,9 @@ async def main():
             print(f'25 + (-17) = {result}')
             result = await client.call("add_two_numbers", a=225, b=-17)
             print(f'225 + (-17) = {result}')
-    except:
-        print("WS-Server konnte nicht verbunden werden, überprüfe ob er läuft")
+    except Exception as e:
+        print(f"Fehler: WS-Server konnte nicht verbunden werden - {e}")
+        print("Überprüfe ob der Server läuft")
 
 
 if __name__ == "__main__":
