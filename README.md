@@ -7,6 +7,7 @@ Ein einfaches Remote Procedure Call System, mit der Möglichkeit, Serverfunktion
 - [Installation](#installation)
 - [Setup und Ausführung](#setup-und-ausführung)
 - [Verwendung](#verwendung)
+- [Unit Tests](#unit-tests)
 - [Anmerkungen](#anmerkungen)
 
 ## Installation
@@ -47,6 +48,19 @@ WS-Server konnte nicht verbunden werden, überprüfe ob er läuft
 Standardmäßig sind ein paar Tests implementiert im websocket_client. Weitere Tests können über die `main()` Methode hinzugefügt oder geändert werden.
 
 Die `call()` Methode wird in `main()` verwendet, um Aufrufe an den Server zu starten. Derzeit ist jedoch nur `add_two_numbers()` implementiert.
+
+## Unit Tests
+Die Test Suite kann über mehrere Möglichkeiten gestartet werden.
+
+Die erste ist:
+```bash
+python test_websocket.py
+```
+
+Die zweite ist:
+```bash
+pytest test_websocket.py -v
+```
 
 ## Anmerkungen
 
